@@ -4,7 +4,7 @@
  */
 
 var path = require('path');
-var spawn = require('child_process').spawn;
+var spawn = require('child_process').exec;
 var checkDependencies = require('dependency-check');
 var recursive = require('recursive-readdir');
 
@@ -29,11 +29,20 @@ module.exports = {
         }, function (error, data) {
           var missingAdapters = ['sails-' + this.answers['database:adapter'].toLowerCase(), 'sails-disk'];
           var missingDependencies = checkDependencies.missing(data.package, data.used).concat(missingAdapters);
-          var npmInstall = spawn('npm', ['install', '--save', '--color', 'always'].concat(missingDependencies));
+          console.log('Installing dependencies...');
+          spawn('npm install --save --color always ' + missingDependencies.join(' '),
 
-          npmInstall.stdout.pipe(process.stdout);
-          npmInstall.stderr.pipe(process.stderr);
-          npmInstall.on('close', done);
+            function (error, stdout, stderr) {
+              console.log(stdout);
+              if (error !== null) {
+                console.error(stderr);
+              }
+              console.log('Done!');
+              done();
+            }
+
+          );
+
         }.bind(this));
       }.bind(this));
     }
@@ -45,10 +54,19 @@ module.exports = {
   installDevDependencies: function () {
     if (!this.options['skip-install']) {
       var done = this.async();
-      var npmInstall = spawn('npm', ['install', '--save', '--color', 'always']);
-      npmInstall.stdout.pipe(process.stdout);
-      npmInstall.stderr.pipe(process.stderr);
-      npmInstall.on('close', done);
+      console.log('Installing development dependencies...');
+      spawn('npm install --save --color always',
+
+        function (error, stdout, stderr) {
+          console.log(stdout);
+          if (error !== null) {
+            console.error(stderr);
+          }
+          console.log('Done!');
+          done();
+        }
+
+      );
     }
   }
 };

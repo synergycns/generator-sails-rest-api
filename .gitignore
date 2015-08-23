@@ -1,3 +1,6 @@
+# Local
+config/local.js
+
 # Logs
 logs
 *.log
@@ -33,3 +36,4 @@ node_modules
 nbproject
 .idea
 .node_history
+.tmp

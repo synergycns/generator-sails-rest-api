@@ -12,30 +12,13 @@
     "yeoman",
     "generator"
   ],
-  "homepage": "https://github.com/ghaiklor/generator-sails-rest-api",
-  "bugs": {
-    "url": "https://github.com/ghaiklor/generator-sails-rest-api/issues",
-    "email": "ghaiklor@gmail.com"
-  },
-  "license": "MIT",
-  "author": {
-    "name": "Eugene Obrezkov",
-    "email": "ghaiklor@gmail.com",
-    "url": "http://ghaiklor.com/"
-  },
-  "contributors": [
-    {
-      "name": "Dmitriy Akulich",
-      "url": "https://github.com/IncoCode"
-    }
-  ],
   "main": "generators/app/index.js",
   "scripts": {
     "test": "istanbul cover _mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ghaiklor/generator-sails-rest-api.git"
+    "url": "https://github.com/synergycns/generator-sails-rest-api.git"
   },
   "dependencies": {
     "chalk": "^1.1.0",
