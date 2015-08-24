@@ -1,6 +1,7 @@
 var permissionPolicies = [
   'isAuthenticated',
   'ModelPolicy',
+  'AuditPolicy',
   'OwnerPolicy',
   'PermissionPolicy',
   'RolePolicy',

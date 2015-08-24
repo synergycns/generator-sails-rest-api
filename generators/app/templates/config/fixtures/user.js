@@ -20,6 +20,8 @@ exports.create = function (roles, userModel) {
       return User.register({
         username: sails.config.permissions.adminUsername,
         password: sails.config.permissions.adminPassword,
+        firstName: 'API',
+        lastName: 'Administrator',
         email: sails.config.permissions.adminEmail,
         roles: [ _.find(roles, { name: 'admin' }).id ],
         createdBy: 1,

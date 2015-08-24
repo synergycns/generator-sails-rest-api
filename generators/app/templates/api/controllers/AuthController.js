@@ -79,8 +79,6 @@ _.merge(exports, {
           return tryAgain();
         }
 
-        req.session.authenticated = true;
-
         // Upon successful login, optionally redirect the user if there is a
         // `next` query param
         if (req.query.next) {
