@@ -3,7 +3,8 @@ var permissionPolicies = [
   'ModelPolicy',
   'OwnerPolicy',
   'PermissionPolicy',
-  'RolePolicy'
+  'RolePolicy',
+  'CriteriaPolicy'
 ];
 module.exports = function (sails) {
   return {
