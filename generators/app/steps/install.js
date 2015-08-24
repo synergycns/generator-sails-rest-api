@@ -3,6 +3,7 @@
  * Where installation are run (npm, bower)
  */
 
+var chalk = require('chalk');
 var path = require('path');
 var spawn = require('child_process').exec;
 var checkDependencies = require('dependency-check');
@@ -29,7 +30,7 @@ module.exports = {
         }, function (error, data) {
           var missingAdapters = ['sails-' + this.answers['database:adapter'].toLowerCase(), 'sails-disk'];
           var missingDependencies = checkDependencies.missing(data.package, data.used).concat(missingAdapters);
-          console.log('Installing dependencies...');
+          this.log(chalk.yellow('Installing dependencies via npm... This could take a few minutes so be patient!'));
           spawn('npm install --save --color always ' + missingDependencies.join(' '),
 
             function (error, stdout, stderr) {
@@ -37,7 +38,7 @@ module.exports = {
               if (error !== null) {
                 console.error(stderr);
               }
-              console.log('Done!');
+              this.log(chalk.green('Done!'));
               done();
             }
 
@@ -54,7 +55,7 @@ module.exports = {
   installDevDependencies: function () {
     if (!this.options['skip-install']) {
       var done = this.async();
-      console.log('Installing development dependencies...');
+      this.log(chalk.yellow('Installing development dependencies via npm... This could take a few miniutes so be patient!'));
       spawn('npm install --save --color always',
 
         function (error, stdout, stderr) {
@@ -62,7 +63,7 @@ module.exports = {
           if (error !== null) {
             console.error(stderr);
           }
-          console.log('Done!');
+          this.log(chalk.green('Done!'));
           done();
         }
 
