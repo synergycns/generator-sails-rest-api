@@ -38,7 +38,7 @@ module.exports = {
               if (error !== null) {
                 console.error(stderr);
               }
-              this.log(chalk.green('Done!'));
+              console.log(chalk.green('Done!'));
               done();
             }
 
@@ -63,7 +63,7 @@ module.exports = {
           if (error !== null) {
             console.error(stderr);
           }
-          this.log(chalk.green('Done!'));
+          console.log(chalk.green('Done!'));
           done();
         }
 
