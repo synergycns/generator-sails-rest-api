@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "chalk": "^1.1.0",
-    "dependency-check": "^2.5.0",
+    "dependency-check": "git://github.com/synergycns/dependency-check.git",
     "passport-jwt": "^1.1.1",
     "print-message": "^1.4.0",
     "recursive-readdir": "^1.2.1",
