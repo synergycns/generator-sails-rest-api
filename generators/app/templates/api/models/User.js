@@ -89,13 +89,14 @@ module.exports = {
       user.username = user.email;
     }
     user.password = HashService.bcrypt.hashSync(user.password);
-    console.log('beforeCreate - Hashed password: ' + user.password);
     next();
   },
   beforeUpdate: function (values, next) {
-    if (values.password && values.password.length < 60) {
-      values.password = HashService.bcrypt.hashSync(values.password);
-      console.log('beforeUpdate - Hashed password: ' + values.password);
+    if(values.password) {
+      var blnIsHash = HashService.isBCryptHash(values.password);
+      if(!blnIsHash) {
+        values.password = HashService.bcrypt.hashSync(values.password);
+      }
     }
     next();
   }
