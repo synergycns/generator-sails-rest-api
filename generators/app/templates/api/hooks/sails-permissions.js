@@ -1,12 +1,3 @@
-var permissionPolicies = [
-  'isAuthenticated',
-  'ModelPolicy',
-  'AuditPolicy',
-  'OwnerPolicy',
-  'PermissionPolicy',
-  'RolePolicy',
-  'CriteriaPolicy'
-];
 module.exports = function (sails) {
   return {
     identity: 'permissions',
@@ -22,20 +13,7 @@ module.exports = function (sails) {
       sails.config.blueprints.populate = false;
     },
     initialize: function (next) {
-      sails.log.info('permissions: initializing sails-permissions hook');
-
-      if (!validateDependencies(sails)) {
-        sails.log.error('Cannot find sails-auth hook. Did you "npm install sails-auth --save"?');
-        sails.log.error('Please see README for installation instructions: https://github.com/tjwebb/sails-permissions');
-        return sails.lower();
-      }
-
-      if (!validatePolicyConfig(sails)) {
-        sails.log.error('One or more required policies are missing.');
-        sails.log.error('Please see README for installation instructions: https://github.com/tjwebb/sails-permissions');
-        return sails.lower();
-      }
-
+      sails.log.info('permissions: initializing hook');
 
       sails.after(sails.config.permissions.afterEvent, function () {
           installModelOwnership(sails);
@@ -115,17 +93,4 @@ function installModelOwnership (sails) {
       }
     });
   });
-}
-
-function validatePolicyConfig (sails) {
-  var policies = sails.config.policies;
-  return _.all([
-    _.isArray(policies['*']),
-    _.intersection(permissionPolicies, policies['*']).length === permissionPolicies.length,
-    policies.AuthController && _.contains(policies.AuthController['*'], 'passport')
-  ]);
-}
-
-function validateDependencies (sails) {
-  return !!sails.hooks['sails-auth'];
 }

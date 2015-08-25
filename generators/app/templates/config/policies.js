@@ -29,7 +29,11 @@ module.exports.policies = {
   ],
 
   AuthController: {
-    '*': [ 'passport' ]
+    '*': true
+  },
+
+  PingController: {
+    '*': true
   }
 
 };

@@ -6,7 +6,7 @@ var Promise = require('bluebird');
  *
  * In order to proceed to the controller, the following verifications
  * must pass:
- * 1. User is logged in (handled previously by sails-auth sessionAuth policy)
+ * 1. User is authenticated
  * 2. User has Permission to perform action on Model
  * 3. User has Permission to perform action on Attribute (if applicable) [TODO]
  * 4. User is satisfactorily related to the Object's owner (if applicable)

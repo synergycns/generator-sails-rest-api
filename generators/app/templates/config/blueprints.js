@@ -58,13 +58,13 @@ module.exports.blueprints = {
    * from other models which are linked by associations
    * @type {Boolean}
    */
-  populate: true,
+  populate: false,
 
   /**
    * Whether to run Model.watch() in the find and findOne blueprint actions
    * @type {Boolean}
    */
-  autoWatch: true,
+  autoWatch: false,
 
   /**
    * The default number of records to show in the response from a "find" action

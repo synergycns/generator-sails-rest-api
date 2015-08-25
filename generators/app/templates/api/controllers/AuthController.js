@@ -1,96 +1,77 @@
+/**
+ * AuthController
+ * @description :: Server-side logic for manage user's authorization
+ */
 
 var _ = require('lodash');
-var _super = require('sails-auth/api/controllers/AuthController');
+var passport = require('passport');
 
-_.merge(exports, _super);
-_.merge(exports, {
+/**
+ * Triggers when user authenticates via passport
+ * @private
+ */
+function _onPassportAuth(req, res, error, user, info) {
+  if (error) return res.serverError(error);
+  if (!user) return res.unauthorized(null, info && info.code, info && info.message);
 
-  // Extend with custom logic here by adding additional fields, methods, etc.
+  return res.ok({
+    token: CipherService.jwt.encodeSync({id: user.id}),
+    user: user
+  });
+}
+
+module.exports = {
 
   /**
-   * Create a authentication callback endpoint - Override the default behavior of sails-auth
-   * in order to include JWT in response to successful authentication
-   *
-   * This endpoint handles everything related to creating and verifying Pass-
-   * ports and users, both locally and from third-aprty providers.
-   *
-   * Passport exposes a login() function on req (also aliased as logIn()) that
-   * can be used to establish a login session. When the login operation
-   * completes, user will be assigned to req.user.
-   *
-   * For more information on logging in users in Passport.js, check out:
-   * http://passportjs.org/guide/login/
-   *
-   * @param {Object} req
-   * @param {Object} res
+   * Sign in by email\password
    */
-  callback: function (req, res) {
-    function tryAgain (err) {
+  signin: function (req, res) {
+    passport.authenticate('local', _.partial(_onPassportAuth, req, res))(req, res);
+  },
 
-      // Only certain error messages are returned via req.flash('error', someError)
-      // because we shouldn't expose internal authorization errors to the user.
-      // We do return a generic error and the original request body.
-      var flashError = req.flash('error')[0];
-      if (err || flashError) {
-        sails.log.warn(err);
-        sails.log.warn(flashError);
-      }
+  /**
+   * Sign up in system by email\password
+   */
+  signup: function (req, res) {
+    var values = _.omit(req.allParams(), 'id');
 
-      if (err && !flashError ) {
-        req.flash('error', 'Error.Passport.Generic');
-      }
-      else if (flashError) {
-        req.flash('error', flashError);
-      }
-      req.flash('form', req.body);
-
-      // If an error was thrown, redirect the user to the
-      // login, register or disconnect action initiator view.
-      // These views should take care of rendering the error messages.
-      var action = req.param('action');
-
-      if (action === 'register') {
-        res.redirect('/register');
-      }
-      else if (action === 'login') {
-        res.redirect('/login');
-      }
-      else if (action === 'disconnect') {
-        res.redirect('back');
-      }
-      else {
-        // make sure the server always returns a response to the client
-        // i.e passport-local bad username/email or password
-        res.forbidden();
-      }
-
-    }
-
-    sails.services.passport.callback(req, res, function (err, user) {
-
-      if (err || !user) {
-        sails.log.warn(err);
-        return tryAgain();
-      }
-
-      req.login(user, function (err) {
-        if (err) {
-          sails.log.warn(err);
-          return tryAgain();
-        }
-
-        // Upon successful login, optionally redirect the user if there is a
-        // `next` query param
-        if (req.query.next) {
-          res.status(302).set('Location', req.query.next);
-        }
-
-        sails.log.info('user', user, 'authenticated successfully');
-        return res.ok({
+    User
+      .create(values)
+      .then(function (user) {
+        return {
           token: CipherService.jwt.encodeSync({id: user.id}),
           user: user
-        });
-      });
+        };
+      })
+      .then(res.created)
+      .catch(res.serverError);
+  },
+
+  /**
+   * Authorization via social networks
+   */
+  social: function (req, res) {
+    var type = req.param('type') ? req.param('type').toLowerCase() : '-';
+    var strategyName = [type, 'token'].join('-');
+
+    if (Object.keys(passport._strategies).indexOf(strategyName) === -1) {
+      return res.badRequest(null, null, [type, ' is not supported'].join(''));
+    }
+
+    passport.authenticate('jwt', function (error, user, info) {
+      req.user = user;
+      passport.authenticate(strategyName, _.partial(_onPassportAuth, req, res))(req, res);
+    })(req, res);
+  },
+
+  /**
+   * Accept JSON Web Token and updates with new one
+   */
+  refresh_token: function (req, res) {
+    var oldDecoded = CipherService.jwt.decodeSync(req.param('token'));
+
+    res.ok({
+      token: CipherService.jwt.encodeSync({id: oldDecoded.id})
     });
   }
-});
+};

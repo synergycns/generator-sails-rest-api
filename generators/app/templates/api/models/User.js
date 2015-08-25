@@ -1,10 +1,33 @@
 var _ = require('lodash');
-var _super = require('sails-auth/api/models/User');
-var Promise = require('bluebird');
+var Promise = require("bluebird");
 
-_.merge(exports, _super);
-_.merge(exports, {
+/** @module User */
+module.exports = {
   attributes: {
+    firstName: {
+      type: 'string',
+      defaultsTo: ''
+    },
+    lastName: {
+      type: 'string',
+      defaultsTo: ''
+    },
+    username: {
+      type: 'string',
+      unique: true,
+      index: true,
+      required: true,
+      alphanumericdashed: true
+    },
+    email: {
+      type: 'email',
+      required: true,
+      unique: true,
+      index: true
+    },
+    password: {
+      type: 'string'
+    },
     roles: {
       collection: 'Role',
       via: 'users',
@@ -14,16 +37,15 @@ _.merge(exports, {
       collection: "Permission",
       via: "user"
     },
-    firstName: {
-      type: 'string',
-      defaultsTo: ''
+    socialProfiles: {
+      type: 'object'
     },
-    lastName: {
-      type: 'string',
-      defaultsTo: ''
-    },
+    toJSON: function () {
+      var user = this.toObject();
+      delete user.password;
+      return user;
+    }
   },
-
   /**
    * Attach default Role to a new User
    */
@@ -42,24 +64,39 @@ _.merge(exports, {
     },
     function attachDefaultRole (user, next) {
       Promise.bind({ }, User.findOne(user.id)
-        .populate('roles')
-        .then(function (user) {
-          this.user = user;
-          return Role.findOne({ name: 'registered' });
-        })
-        .then(function (role) {
-          this.user.roles.add(role.id);
-          return this.user.save();
-        })
-        .then(function (updatedUser) {
-          sails.log.silly('role "registered" attached to user', this.user.username);
-          next();
-        })
-        .catch(function (e) {
-          sails.log.error(e);
-          next(e);
-        })
+          .populate('roles')
+          .then(function (user) {
+            this.user = user;
+            return Role.findOne({ name: 'registered' });
+          })
+          .then(function (role) {
+            this.user.roles.add(role.id);
+            return this.user.save();
+          })
+          .then(function (updatedUser) {
+            sails.log.silly('role "registered" attached to user', this.user.username);
+            next();
+          })
+          .catch(function (e) {
+            sails.log.error(e);
+            next(e);
+          })
       );
     }
-  ]
-});
+  ],
+  beforeCreate: function (user, next) {
+    if (_.isEmpty(user.username)) {
+      user.username = user.email;
+    }
+    user.password = HashService.bcrypt.hashSync(user.password);
+    console.log('beforeCreate - Hashed password: ' + user.password);
+    next();
+  },
+  beforeUpdate: function (values, next) {
+    if (values.password && values.password.length < 60) {
+      values.password = HashService.bcrypt.hashSync(values.password);
+      console.log('beforeUpdate - Hashed password: ' + values.password);
+    }
+    next();
+  }
+};

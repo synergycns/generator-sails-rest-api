@@ -15,12 +15,12 @@ module.exports = {
   attributes: {
     name: {
       type: 'string',
-      notNull: true,
+      required: true,
       unique: true
     },
     identity: {
       type: 'string',
-      notNull: true
+      required: true
     },
     attributes: {
       type: 'json'

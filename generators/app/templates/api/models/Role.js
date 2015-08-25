@@ -16,7 +16,7 @@ module.exports = {
     name: {
       type: 'string',
       index: true,
-      notNull: true,
+      required: true,
       unique: true
     },
     users: {
