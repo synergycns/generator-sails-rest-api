@@ -1,5 +1,5 @@
 var hashes = require('sails-service-hash');
-var BCRYPT_REGEX = /^\$2[aby]\$[0-9]{2}\$.{22}\$.{31}$/;
+var BCRYPT_REGEX = /^\$2[aby]\$[0-9]{2}\$.{53}$/;
 
 module.exports = {
   bcrypt: hashes.create('bcrypt', {}),
